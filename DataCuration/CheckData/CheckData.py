@@ -143,6 +143,7 @@ class CheckDataWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.ui.radiologyButton.connect('clicked(bool)', self.onRadButton)
         self.ui.preImagesButton.connect('clicked(bool)', self.onPreImagesButton)
         self.ui.intraImagesButton.connect('clicked(bool)', self.onIntraImagesButton)
+        self.ui.targetsButton.connect('clicked(bool)', self.onTargetsButton)
         
        
 
@@ -158,12 +159,14 @@ class CheckDataWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         path = self.ui.directoryReport.directory
         radiologyReport = path + "/TK928_20220411_171633_Rad.txt"
         self.ui.textBrowser.clear()
+        date = self.ui.eventDate.date.toString("M/d/yyyy")
+        print(date)
         with open(radiologyReport, 'r') as fp:
         # read all lines using readline()
             lines = fp.readlines()
             for row in lines:
             # check if string present on a current line
-                if row.find(self.ui.lineMRN.text) != -1 and row.find(self.ui.date.text) != -1:
+                if row.find(self.ui.lineMRN.text) != -1 and row.find(date) != -1:
                     print('string exists in file')
                     g = lines.index(row)
                     print(row)
@@ -184,13 +187,14 @@ class CheckDataWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         path = self.ui.directoryReport.directory
         radiologyReport = path + "/TK928_20220411_171633_Pat.txt"
         self.ui.textBrowser.clear()
-        print(self.ui.date.text)
+        date = self.ui.eventDate.date.toString("M/d/yyyy")
+        print(date)
         with open(radiologyReport, 'r') as fp:
         # read all lines using readline()
             lines = fp.readlines()
             for row in lines:
             # check if string present on a current line
-                if row.find(self.ui.lineMRN.text) != -1 and row.find(self.ui.date.text) != -1:
+                if row.find(self.ui.lineMRN.text) != -1 and row.find(date) != -1:
                     print('string exists in file')
                     g = lines.index(row)
                     print(row)
@@ -217,8 +221,8 @@ class CheckDataWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         print("-here pre-")
         path = self.ui.directorypreImages.directory
         mrn = self.ui.lineMRN.text
-        date = self.ui.date.text.split("/")
-        _date = date[2]+date[0]+date[1]
+        #date = self.ui.date.text.split("/")
+        _date = self.ui.eventDate.date.toString("yyyyMMdd")
         files = os.listdir(path)
         completePath = " "
         print(_date)
@@ -239,8 +243,7 @@ class CheckDataWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
         path = self.ui.directorypreImages.directory
         mrn = self.ui.lineMRN.text
-        date = self.ui.date.text.split("/")
-        _date = date[2]+date[0]+date[1]
+        _date = self.ui.eventDate.date.toString("yyyyMMdd")
         files = os.listdir(path)     
         completePath = " "     
         for text in files:
@@ -260,17 +263,25 @@ class CheckDataWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
         path = self.ui.directorypreImages.directory
         mrn = self.ui.lineMRN.text
-        date = self.ui.date.text.split("/")
-        _date = date[2]+date[0]+date[1]
+        _date = self.ui.eventDate.date.toString("yyyyMMdd")
         files = os.listdir(path)     
-        completePath = " "     
+        completePath = " "
+        targetList = " "
         for text in files:
             if _date in text:
                 completePath = path +"/"+ text +"/DICOM/Intraop"
                 if self.checkMRN(completePath):
+                    targetList = path +"/"+ text +"/SliceTrackerOutputs/"
                     break
                 else:
-                    targetList = path +"/"+ text +"slicetrackeroutputs/"
+                    targetList = " "
+        print(targetList)
+        for root, dirs, files in os.walk(targetList):
+            for file in files:
+                if "PreopTargets" in file:
+                    print(file)
+                    target = os.path.join(root, file)
+                    slicer.util.loadMarkups(target)
         #TODO Finish this function to retrieve data.
 
 
