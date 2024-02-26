@@ -1,6 +1,6 @@
 import logging
 import os
-
+import pydicom
 import vtk
 
 import slicer
@@ -141,7 +141,10 @@ class CheckDataWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         # Buttons
         self.ui.PathologyButton.connect('clicked(bool)', self.onPatButton)
         self.ui.radiologyButton.connect('clicked(bool)', self.onRadButton)
-
+        self.ui.preImagesButton.connect('clicked(bool)', self.onPreImagesButton)
+        self.ui.intraImagesButton.connect('clicked(bool)', self.onIntraImagesButton)
+        
+       
 
 
         # Make sure parameter node is initialized (needed for module reload)
@@ -154,6 +157,7 @@ class CheckDataWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         """
         path = self.ui.directoryReport.directory
         radiologyReport = path + "/TK928_20220411_171633_Rad.txt"
+        self.ui.textBrowser.clear()
         with open(radiologyReport, 'r') as fp:
         # read all lines using readline()
             lines = fp.readlines()
@@ -179,6 +183,7 @@ class CheckDataWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         path = self.ui.directoryReport.directory
         radiologyReport = path + "/TK928_20220411_171633_Rad.txt"
         radiologyReport = path + "/TK928_20220411_171633_Pat.txt"
+        self.ui.textBrowser.clear()
         with open(radiologyReport, 'r') as fp:
         # read all lines using readline()
             lines = fp.readlines()
@@ -196,7 +201,74 @@ class CheckDataWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
                         if lines[g+n].find('[report_end]') != -1:
                             break
+
+    def checkMRN(self,path):
+        files = os.listdir(path)
+        fileTocheck = path +"/"+files[0]
+        ds = pydicom.filereader.dcmread(fileTocheck)
+        if ds.PatientID == self.ui.lineMRN.text:
+            print("true")
+            return True
+        else:
+            return False
         
+    def onPreImagesButton(self):
+
+        path = self.ui.directorypreImages.directory
+        mrn = self.ui.lineMRN.text
+        date = self.ui.date.text.split("/")
+        _date = date[2]+date[0]+date[1]
+        files = os.listdir(path)
+        completePath = " "     
+        for text in files:
+            if _date in text:
+                completePath = path +"/"+ text +"/dicom/Preop"
+                if not self.checkMRN(completePath):
+                    completePath = " "
+                
+        if completePath != " ":
+            slicer.util.selectModule("DICOM")
+            dicomBrowser = slicer.modules.DICOMWidget.browserWidget.dicomBrowser
+            dicomBrowser.importDirectory(completePath, dicomBrowser.ImportDirectoryAddLink)
+
+    def onIntraImagesButton(self):
+
+        path = self.ui.directorypreImages.directory
+        mrn = self.ui.lineMRN.text
+        date = self.ui.date.text.split("/")
+        _date = date[2]+date[0]+date[1]
+        files = os.listdir(path)     
+        completePath = " "     
+        for text in files:
+            if _date in text:
+                completePath = path +"/"+ text +"/dicom/Intraop"
+                if not self.checkMRN(completePath):
+                    completePath = " "
+                
+        if completePath != " ":
+            slicer.util.selectModule("DICOM")
+            dicomBrowser = slicer.modules.DICOMWidget.browserWidget.dicomBrowser
+            dicomBrowser.importDirectory(completePath, dicomBrowser.ImportDirectoryAddLink)
+            
+            
+            
+    def onTargetsButton(self):
+
+        path = self.ui.directorypreImages.directory
+        mrn = self.ui.lineMRN.text
+        date = self.ui.date.text.split("/")
+        _date = date[2]+date[0]+date[1]
+        files = os.listdir(path)     
+        completePath = " "     
+        for text in files:
+            if _date in text:
+                completePath = path +"/"+ text +"/dicom/Intraop"
+                if not self.checkMRN(completePath):
+                    targetList = " "
+                else:
+                    targetList = path +"/"+ text +"slicetrackeroutputs/"
+        #TODO Finish this function to retrieve data.
+
 
     def cleanup(self):
         """

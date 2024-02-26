@@ -47,18 +47,18 @@
       <item row="2" column="1">
        <widget class="ctkDirectoryButton" name="directoryIntraprocedures"/>
       </item>
-      <item row="3" column="1">
-       <widget class="QLineEdit" name="lineMRN"/>
-      </item>
-      <item row="4" column="1">
-       <widget class="QLineEdit" name="date"/>
-      </item>
       <item row="3" column="0">
        <widget class="QLabel" name="label_2">
         <property name="text">
          <string>MRN</string>
         </property>
        </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QLineEdit" name="lineMRN"/>
+      </item>
+      <item row="4" column="1">
+       <widget class="QLineEdit" name="date"/>
       </item>
       <item row="4" column="0">
        <widget class="QLabel" name="label_3">
@@ -71,16 +71,16 @@
     </widget>
    </item>
    <item>
-    <widget class="QPushButton" name="preImagesButton">
+    <widget class="QPushButton" name="intraImagesButton">
      <property name="text">
-      <string>Diagnostic images</string>
+      <string>Intraprocedural images</string>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QPushButton" name="intraImagesButton">
+    <widget class="QPushButton" name="preImagesButton">
      <property name="text">
-      <string>Intraprocedural images</string>
+      <string>Diagnostic images</string>
      </property>
     </widget>
    </item>
