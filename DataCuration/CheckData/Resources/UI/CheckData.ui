@@ -30,7 +30,7 @@
       <item row="1" column="0">
        <widget class="QLabel" name="label_6">
         <property name="text">
-         <string>Diagnostic images</string>
+         <string>Images</string>
         </property>
        </widget>
       </item>
@@ -40,7 +40,7 @@
       <item row="2" column="0">
        <widget class="QLabel" name="label_7">
         <property name="text">
-         <string>Biopsy images</string>
+         <string>Non-ann.  images</string>
         </property>
        </widget>
       </item>

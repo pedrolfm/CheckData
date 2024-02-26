@@ -180,10 +180,11 @@ class CheckDataWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         """
         Run processing when user clicks "Apply" button.
         """
+        print('start search for pathology')
         path = self.ui.directoryReport.directory
-        radiologyReport = path + "/TK928_20220411_171633_Rad.txt"
         radiologyReport = path + "/TK928_20220411_171633_Pat.txt"
         self.ui.textBrowser.clear()
+        print(self.ui.date.text)
         with open(radiologyReport, 'r') as fp:
         # read all lines using readline()
             lines = fp.readlines()
@@ -213,19 +214,22 @@ class CheckDataWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
             return False
         
     def onPreImagesButton(self):
-
+        print("-here pre-")
         path = self.ui.directorypreImages.directory
         mrn = self.ui.lineMRN.text
         date = self.ui.date.text.split("/")
         _date = date[2]+date[0]+date[1]
         files = os.listdir(path)
-        completePath = " "     
+        completePath = " "
+        print(_date)
         for text in files:
             if _date in text:
-                completePath = path +"/"+ text +"/dicom/Preop"
-                if not self.checkMRN(completePath):
-                    completePath = " "
+                completePath = path +"/"+ text +"/DICOM/Preop"
+                print(completePath)  
+                if self.checkMRN(completePath):
+                    break
                 
+        print(completePath)        
         if completePath != " ":
             slicer.util.selectModule("DICOM")
             dicomBrowser = slicer.modules.DICOMWidget.browserWidget.dicomBrowser
@@ -241,9 +245,9 @@ class CheckDataWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         completePath = " "     
         for text in files:
             if _date in text:
-                completePath = path +"/"+ text +"/dicom/Intraop"
-                if not self.checkMRN(completePath):
-                    completePath = " "
+                completePath = path +"/"+ text +"/DICOM/Intraop"
+                if self.checkMRN(completePath):
+                    break
                 
         if completePath != " ":
             slicer.util.selectModule("DICOM")
@@ -262,9 +266,9 @@ class CheckDataWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         completePath = " "     
         for text in files:
             if _date in text:
-                completePath = path +"/"+ text +"/dicom/Intraop"
-                if not self.checkMRN(completePath):
-                    targetList = " "
+                completePath = path +"/"+ text +"/DICOM/Intraop"
+                if self.checkMRN(completePath):
+                    break
                 else:
                     targetList = path +"/"+ text +"slicetrackeroutputs/"
         #TODO Finish this function to retrieve data.
@@ -354,11 +358,6 @@ class CheckDataWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self._updatingGUIFromParameterNode = True
 
         # Update node selectors and sliders
-        self.ui.inputSelector.setCurrentNode(self._parameterNode.GetNodeReference("InputVolume"))
-        self.ui.outputSelector.setCurrentNode(self._parameterNode.GetNodeReference("OutputVolume"))
-        self.ui.invertedOutputSelector.setCurrentNode(self._parameterNode.GetNodeReference("OutputVolumeInverse"))
-        self.ui.imageThresholdSliderWidget.value = float(self._parameterNode.GetParameter("Threshold"))
-        self.ui.invertOutputCheckBox.checked = (self._parameterNode.GetParameter("Invert") == "true")
 
         # Update buttons states and tooltips
         if self._parameterNode.GetNodeReference("InputVolume") and self._parameterNode.GetNodeReference("OutputVolume"):
